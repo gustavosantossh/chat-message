@@ -49,6 +49,7 @@ class ChatRoom extends Model
             'second_user_id' => max($loggedUserId, $participantId),
         ]);
 
+        // dd($chatRoom);
         return $chatRoom;
     }
 }

@@ -64,4 +64,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function UserHasContacts(){
+        return $this->belongsToMany(User::class, 'contacts', 'id_user', 'id_contact');
+    }
+
 }

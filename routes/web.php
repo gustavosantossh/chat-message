@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChatRoom;
+use App\Http\Controllers\GeminiIa;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -17,4 +18,5 @@ Route::middleware([
     })->name('dashboard');
 
     Route::get('/dashboard/chat/{id}', [ChatRoom::class, 'show'])->name('chat.room');
+    Route::get('/dashboard/gemini', [GeminiIa::class, 'index'])->name('chat.gemini');
 });
