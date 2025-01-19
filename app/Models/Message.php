@@ -35,13 +35,27 @@ class Message extends Model
             $query->where('sender_id', $receiverId)
                 ->where('receiver_id', $sender_id);
         })
-        ->with('sender:id,name', 'receiver:id,name')->get();
+        ->orderBy('created_at', 'asc')
+        ->with('sender:id,name', 'receiver:id,name')
+        ->get();
     }
 
     public static function listNewMessages($event){
         return self::whereId($event['message']['id'])
         ->with('sender:id,name', 'receiver:id,name')
         ->first();
+    }
+
+    public static function deleteContactMessages($senderId, $receiverId){
+        return self::where(function($query) use ($senderId, $receiverId){
+            $query->where('sender_id', $senderId)
+            ->where('receiver_id', $receiverId);
+
+        })->orWhere(function($query) use ($senderId, $receiverId){
+            $query->where('sender_id', $receiverId)
+            ->where('receiver_id', $senderId);
+
+        })->delete();
     }
 
 

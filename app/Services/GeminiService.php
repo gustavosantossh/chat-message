@@ -2,15 +2,23 @@
 
 namespace App\Services;
 
+use App\Models\GeminiBotChatMessages;
 use Gemini as GlobalGemini;
 
 class GeminiService
 {
-    public function GeminiGenerateText(string $prompt){
-        $client = GlobalGemini::client(env('GEMINI_API_KEY'));
+    public function GeminiGenerateText(string $prompt, $userId){
 
-        $result = $client->geminiPro()->generateContent($prompt);
+        $geminiClient = GlobalGemini::client(env('GEMINI_API_KEY'));
 
-        return $result;
+        $generatedContent  = $geminiClient->geminiPro()->generateContent($prompt);
+
+        $formatedText = $generatedContent ->text();
+
+        $GeminiBotChatMessages = new GeminiBotChatMessages();
+
+        $messageSaved = $GeminiBotChatMessages->saveMessage($userId, $formatedText);
+
+        return $formatedText;
     }
 }

@@ -15,7 +15,6 @@ class Contacts extends Model
         'id_contact'
     ];
 
-
     public function users()
     {
         return $this->belongsToMany(User::class, 'contacts', 'id_contact', 'id_user');
@@ -26,21 +25,50 @@ class Contacts extends Model
 
         $userId = auth()->guard()->id();
 
-        $contactAlreadyExists = Contacts::where('id_user', $userId)->where('id_contact', $idContact)->exists();
+        $contactAlreadyExists = $this->contactAlreadyExists($userId, $idContact);
 
         if(!$contactAlreadyExists){
-            $createContact = Contacts::create([
-                'id_user' => $userId,
-                'id_contact' => $idContact
-            ]);
 
-            session()->flash('success', 'Contato Adicionado com sucesso!');
+            $this->storeContact($userId, $idContact);
+            $this->storeContact($idContact, $userId);
+
+            // $createContact = Contacts::create([
+            //     'id_user' => $userId,
+            //     'id_contact' => $idContact
+            // ]);
+
+            // $createContact = Contacts::create([
+            //     'id_user' => $idContact,
+            //     'id_contact' => $userId
+            // ]);
+
+            return session()->flash('success', 'Contato Adicionado com sucesso!');
         }
+
+        return session()->flash('AlreadyExists', 'Contato já cadastrado!');
 
 
     }
 
-    public function deleteContact($idContact)
+    public function contactAlreadyExists($userId, $contactId){
+        return self::where(function($query) use ($userId, $contactId){
+            $query->where('id_user', $userId)
+                    ->where('id_contact', $contactId);
+        })->orWhere(function($query) use ($userId, $contactId){
+            $query->where('id_user', $contactId)
+                    ->where('id_contact', $userId);
+        })
+        ->exists();
+    }
+
+    private function storeContact($userId, $idContact){
+        self::create([
+            'id_user' => $userId,
+            'id_contact' => $idContact
+        ]);
+    }
+
+    public static function deleteContact($idContact)
     {
 
         $userId = auth()->guard()->id();

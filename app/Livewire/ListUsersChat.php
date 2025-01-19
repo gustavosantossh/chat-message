@@ -10,7 +10,8 @@ class ListUsersChat extends Component
 {
     public $contacts;
     public $searchContacts;
-
+    public $selectedContactId;
+    public $selectedChatBot;
 
     public function mount(){
 
@@ -18,13 +19,14 @@ class ListUsersChat extends Component
 
         $this->contacts = User::with('UserHasContacts')->find($userId);
 
+
     }
 
     public function AdicionarContato($email){
         $findUserByEmail = User::where('email', $email)->exists();
 
         if(!$findUserByEmail){
-            dd('falseaa');
+            return session()->flash('notFound', 'Usuário não encontrado!');
         }
 
         $getIdUserContactByAdded = User::where('email', $email)->pluck('id')->first();
@@ -33,15 +35,15 @@ class ListUsersChat extends Component
 
         $contactsModel->createContact($getIdUserContactByAdded);
 
-
     }
 
-    public function deleteContact($id){
 
-        $contact = new Contacts();
+    public function selectContact($contactId){
+        $this->selectedContactId = $contactId;
+    }
 
-        $contact->deleteContact($id);
-
+    public function selectChatBot($bot){
+        $this->selectedChatBot = $bot;
     }
 
     public function render()

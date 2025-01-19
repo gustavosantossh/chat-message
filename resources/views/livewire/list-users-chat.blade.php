@@ -1,60 +1,105 @@
-<div>
+<div class="w-full h-screen grid grid-cols-12" x-data="{expanded: false, emailContact: ''}">
 
+    <div class="absolute">
+        @if (session()->has('success'))
+            <x-toast-success />
+        @endif
+        @if (session()->has('AlreadyExists'))
+            <x-toast-exists />
+        @endif
+        @if (session()->has('notFound'))
+            <x-toast-not-found />
+        @endif
+    </div>
 
-    @if (session('success'))
-        <script>
-            toastr.success("{{session('success')}}")
-        </script>
-    @endif
+    <div class="w-full h-full col-span-4 px-3 py-4 border-r-2 shadow-md bg-white overflow-auto">
 
-    <div class="p-2 m-3" x-data="{expanded: true}"  >
-        <button @click="expanded = ! expanded" class="bg-green-400 p-3 rounded-md">Adicionar contato</button>
+        <div class="flex flex-col gap-4" >
 
-        <div x-show="expanded" x-collapse>
-            <div class="bg-red-400 mt-3 p-4">
-                <form wire.prevent wire:submit="AdicionarContato(emailContact)">
-                    <label for="email">Email: </label>
-                    <input type="email" name="email" id="email" required x-model="emailContact">
+            <div class="flex justify-between items-center" >
+                <h1 class="text-2xl font-semibold">Conversas</h1>
 
-                    <button>Adicionar</button>
+                <div class="">
+                    <button @click="expanded = !expanded">
+                        <img src="{{asset("icons/add-icon.svg")}}" alt="">
+                    </button>
+                </div>
+
+            </div>
+
+            <div x-show="expanded" x-collapse>
+                <form class="flex flex-col gap-3" wire:submit="AdicionarContato(emailContact)">
+
+                    <label for="email" class="font-semibold text-base">Email: </label>
+
+                    <div class="relative">
+                        <img src="{{asset("icons/mail-icon.svg")}}" class="absolute left-2 top-2" alt="icon mail">
+
+                        <input class="bg-[#F0F2F5] h-9 pl-10 w-full rounded-md border-none focus:ring-0" placeholder="email" type="email" name="email" id="email" required x-model="emailContact">
+                    </div>
+                    <button type="submit" class="w-full bg-[#29e06f] text-white font-semibold py-2 rounded-md">Adicionar Contato</button>
                 </form>
+
             </div>
+
+            <hr>
+
+            <div class="flex">
+                <input class="bg-[#F0F2F5] h-9 w-full rounded-md border-none focus:ring-0" placeholder="Pesquisar" type="text">
+            </div>
+
+            <div class="flex flex-col gap-3 h-[490px] overflow-auto">
+
+                <button wire:click="selectChatBot('gemini')" class="bg-[#1A1C1E] hover:bg-[#2A2C2E] transition-colors duration-200 p-2 rounded-md">
+
+                    <div class="flex gap-4 items-start justify-between ">
+
+                        <div class="flex gap-4 items-center">
+                            <img src="{{asset('icons/google-gemini.png')}}" class="h-14">
+                            <h1 class="text-lg text-white font-semibold">Gemini Bot</h1>
+                        </div>
+
+                    </div>
+
+                </button>
+
+                @foreach ($contacts->UserHasContacts as $contact)
+                    <button wire:click="selectContact({{ $contact->id }})" class="hover:bg-slate-100 duration-100 p-2 border-b">
+
+                        <div class="flex gap-4 items-start justify-between ">
+
+                            <div class="flex gap-4">
+                                <img src="https://picsum.photos/50" class="rounded-full">
+                                <h1 class="text-base">{{$contact->name}}</h1>
+                            </div>
+
+                        </div>
+
+                    </button>
+                @endforeach
+
+            </div>
+
         </div>
-
     </div>
 
-    <div class="p-2 m-3">
-        <span>Pesquisar contato:</span>
-        <input type="text" wire:model.live="searchContacts" class="p-2 m-3"> {{$searchContacts}}
-    </div>
+    <div class="col-span-8">
+        @if($selectedContactId)
 
-    <hr class="p-2 m-3">
+            <livewire:chat-user-room :user_id="$selectedContactId" wire:key="chat-user-room-{{ $selectedContactId }}" />
 
-    <div class="p-2 m-3">
-        <h1 class="text-4xl font-semibold">Contatos</h1>
-    </div>
+        @elseif ($selectedChatBot)
 
-    <div>
-        <a wire:navigate.hover href="{{route('chat.gemini')}}" class="bg-[#1A1C1E] text-white font-semibold flex gap-4 p-2 shadow-md shadow-slate-300 items-center m-3 rounded-md hover:bg-slate-400 transition duration-700">
-                <img src="{{asset('icons/google-gemini.png')}}" class="h-14">
-                <p>Gemini IA </p>
-        </a>
-        @foreach ($contacts->UserHasContacts as $contact)
-        {{-- {{dd($contacts->UserHasContacts[0]->id)}} --}}
+            <livewire:gemini-chat-bot />
 
-            <div class="flex mb-3">
-                <a wire:navigate.hover href="{{route('chat.room', $contact->id)}}" class="flex gap-4 p-2 shadow-md shadow-slate-300 items-center m-3 rounded-md hover:bg-slate-400 transition duration-700 w-full">
-                    <img class="rounded-full" src="{{$contact->profile_photo_url}}">
-                     <p>{{$contact->name}} </p>
-                    </a>
+        @else
 
-                <a wire:confirm="Deseja deletar este contato?" wire:click="deleteContact({{$contact->id}})" class="w-16 m-3 p-4 bg-red-600 rounded-md text-center align-items-center">
-                    <span class="material-symbols-outlined">
-                        delete
-                    </span>
-                </a>
+            <div class="h-screen flex justify-center items-center bg-[#F0F2F5]">
+                <h1 class="text-xl font-semibold">Selecione um chat para iniciar uma conversa.</h1>
             </div>
 
-        @endforeach
+        @endif
+
     </div>
+
 </div>

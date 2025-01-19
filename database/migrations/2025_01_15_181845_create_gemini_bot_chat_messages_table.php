@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::dropIfExists('messages');
-        Schema::create('messages', function (Blueprint $table) {
+        Schema::dropIfExists('gemini_bot_chat_messages');
+        Schema::create('gemini_bot_chat_messages', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->longText('message');
-            $table->foreignId('chat_room_id')->constrained('chat_rooms')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('messages');
+        Schema::dropIfExists('gemini_bot_chat_messages');
     }
 };

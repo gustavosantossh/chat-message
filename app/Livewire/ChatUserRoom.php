@@ -4,9 +4,11 @@ namespace App\Livewire;
 
 use App\Events\MessageSendEvent;
 use App\Models\ChatRoom;
+use App\Models\Contacts;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
+use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
 class ChatUserRoom extends Component
@@ -18,7 +20,6 @@ class ChatUserRoom extends Component
     public $messageInputModel;
     public $listAllMessages;
     public $chatRoomId;
-
 
     public function mount($user_id)
     {
@@ -85,6 +86,7 @@ class ChatUserRoom extends Component
             'message' => $decryptedMessage,
             'sender' => $message->sender->name,
             'receiver' => $message->receiver->name,
+            'created_at' => $message->created_at->format('H:i'),
         ];
     }
 
@@ -93,6 +95,25 @@ class ChatUserRoom extends Component
         return [
             "echo-private:chat.channel.{$this->chatRoomId},MessageSendEvent" => 'listenerForMessage',
         ];
+    }
+
+    public function deleteContact($id){
+
+        try {
+
+            $userId = auth()->guard()->user()->id;
+
+            $contact = Contacts::deleteContact($id);
+
+            $messages = Message::deleteContactMessages($userId, $id);
+
+            return redirect(route('dashboard'))->with('success', 'Contato deletado! :)');
+
+        } catch (\Throwable $th) {
+
+            return redirect(route('dashboard'))->with('error', 'Error, não conseguimos apagar :( ');
+        }
+
     }
 
     public function render()

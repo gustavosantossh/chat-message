@@ -2,10 +2,11 @@
 
 namespace App\Jobs;
 
-use App\Events\TextGenerated;
+use App\Models\GeminiBotChatMessages;
 use App\Services\GeminiService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Cache;
 
 class GenerateTextFromGeminiJob implements ShouldQueue
 {
@@ -13,12 +14,15 @@ class GenerateTextFromGeminiJob implements ShouldQueue
 
 
     public $promptInput;
+    public $userId;
     /**
      * Create a new job instance.
      */
-    public function __construct(string $promptInput)
+    public function __construct(string $promptInput, $userId)
     {
         $this->promptInput = $promptInput;
+        $this->userId = $userId;
+
     }
 
     /**
@@ -28,8 +32,7 @@ class GenerateTextFromGeminiJob implements ShouldQueue
     {
         $generateText = new GeminiService();
 
-        $result = $generateText->GeminiGenerateText($this->promptInput);
+        $result = $generateText->GeminiGenerateText($this->promptInput, $this->userId);
 
-        broadcast(new TextGenerated($result))->toOthers();
     }
 }

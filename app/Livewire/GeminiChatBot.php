@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Jobs\GenerateTextFromGeminiJob;
 use App\Services\GeminiService;
+use Gemini;
 use Livewire\Component;
 
 class GeminiChatBot extends Component
@@ -14,20 +15,12 @@ class GeminiChatBot extends Component
     public $promptInput;
 
     public function formPromptSubmit(){
+        $userId = auth()->guard()->id();
 
-        GenerateTextFromGeminiJob::dispatch($this->promptInput)->onQueue('TextIa');
+        GenerateTextFromGeminiJob::dispatch($userId, $this->promptInput)->onQueue('TextIa');
 
         $this->reset('promptInput');
     }
-
-    // public function getListeners()
-    // {
-    //     return [
-    //         "echo-private:Chat.ia.channel,TextGenerated" => 'formPromptSubmit',
-    //     ];
-    // }
-
-
 
     public function render()
     {
