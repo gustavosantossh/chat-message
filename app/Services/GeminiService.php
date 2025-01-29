@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Events\newMessageBot;
 use App\Models\GeminiBotChatMessages;
 use Gemini as GlobalGemini;
+use Parsedown;
 
 class GeminiService
 {
@@ -13,12 +15,16 @@ class GeminiService
 
         $generatedContent  = $geminiClient->geminiPro()->generateContent($prompt);
 
-        $formatedText = $generatedContent ->text();
+        $formatedText = $generatedContent->text();
+
+        $parsedown = new Parsedown();
+
+        $finalText = $parsedown->text($formatedText);
 
         $GeminiBotChatMessages = new GeminiBotChatMessages();
 
-        $messageSaved = $GeminiBotChatMessages->saveMessage($userId, $formatedText);
+        $messageSaved = $GeminiBotChatMessages->saveMessage($userId, $finalText, $prompt);
 
-        return $formatedText;
+        return $finalText;
     }
 }

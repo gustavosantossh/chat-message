@@ -2,23 +2,29 @@
 
 namespace App\Jobs;
 
+use App\Events\AvisaFrontGemini;
 use App\Models\GeminiBotChatMessages;
-use App\Services\GeminiService;
+use Gemini;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+use Parsedown;
+use Throwable;
 
 class GenerateTextFromGeminiJob implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, Dispatchable, InteractsWithQueue, SerializesModels;
 
 
-    public $promptInput;
-    public $userId;
+    public int $userId;
+    public string $promptInput;
     /**
      * Create a new job instance.
      */
-    public function __construct(string $promptInput, $userId)
+    public function __construct($userId, string $promptInput)
     {
         $this->promptInput = $promptInput;
         $this->userId = $userId;
@@ -30,9 +36,41 @@ class GenerateTextFromGeminiJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $generateText = new GeminiService();
+        try {
 
-        $result = $generateText->GeminiGenerateText($this->promptInput, $this->userId);
+            // Client Configs
+            $geminiClient = Gemini::client("AIzaSyBPSaycxvVHXvr5s1hBvlCOKAjILpMTnMk");
+
+            // Generate Content
+            $generatedContent  = $geminiClient->geminiPro()->generateContent($this->promptInput);
+            $formatedText = $generatedContent->text();
+
+            // Process parsedown
+            $parsedown = new Parsedown();
+            $finalText = $parsedown->text($formatedText);
+
+            // Save as BD
+            $GeminiBotChatMessages = new GeminiBotChatMessages();
+            $messageSaved = $GeminiBotChatMessages->saveMessage($this->userId, $finalText, $this->promptInput);
+
+            // Dispatch event
+           // event(new AvisaFrontGemini($this->userId, $finalText));
+            AvisaFrontGemini::dispatch($this->userId, $finalText);
+
+
+        } catch (\Throwable $th) {
+
+            Log::error('Gemini Job Failed', [
+                'userId' => $this->userId,
+                'prompt' => $this->promptInput,
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString()
+            ]);
+
+            $this->fail($th);
+            throw $th;
+        }
+
 
     }
 }

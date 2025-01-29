@@ -3,8 +3,8 @@
 namespace App\Livewire;
 
 use App\Jobs\GenerateTextFromGeminiJob;
-use App\Services\GeminiService;
-use Gemini;
+use App\Models\GeminiBotChatMessages;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class GeminiChatBot extends Component
@@ -13,6 +13,25 @@ class GeminiChatBot extends Component
 
     public $recentsMessageOnChat;
     public $promptInput;
+    public $messages = [];
+
+
+    public function mount(){
+        $this->messages = GeminiBotChatMessages::listAllChatMessage(auth()->guard()->user()->id);
+    }
+
+
+    public function getListeners() {
+        return [
+            'echo-private:Chat.Bot.' . auth()->guard()->user()->id . ',AvisaFrontGemini' => 'loadRecords'
+        ];
+    }
+
+    public function loadRecords(){
+        $this->messages =  GeminiBotChatMessages::listLastChatMessage(auth()->guard()->user()->id);
+        $this->dispatch('messageUp');
+        // dd($this->messages);
+    }
 
     public function formPromptSubmit(){
         $userId = auth()->guard()->id();
@@ -20,6 +39,15 @@ class GeminiChatBot extends Component
         GenerateTextFromGeminiJob::dispatch($userId, $this->promptInput)->onQueue('TextIa');
 
         $this->reset('promptInput');
+    }
+
+    public function deleteBotMessages() {
+        $delete = GeminiBotChatMessages::deleteChatMessage(auth()->guard()->user()->id);
+
+        if (!$delete){
+            return redirect(route('dashboard'))->with('notFound', 'Ops, sistema indisponivel!');
+        }
+        return redirect(route('dashboard'))->with('success', 'Histórico apagado!');
     }
 
     public function render()

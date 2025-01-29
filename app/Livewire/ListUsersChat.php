@@ -8,17 +8,19 @@ use Livewire\Component;
 
 class ListUsersChat extends Component
 {
+    public $userId;
     public $contacts;
-    public $searchContacts;
+    public $searchContacts = '';
     public $selectedContactId;
     public $selectedChatBot;
+    public $chatType;
 
     public function mount(){
 
-        $userId = auth()->guard()->user()->id;
+        $this->userId = auth()->guard()->user()->id;
 
-        $this->contacts = User::with('UserHasContacts')->find($userId);
-
+        $this->contacts = Contacts::listContacts($this->userId);
+        // $this->contacts = User::with('UserHasContacts')->find($this->userId);
 
     }
 
@@ -37,13 +39,18 @@ class ListUsersChat extends Component
 
     }
 
-
     public function selectContact($contactId){
         $this->selectedContactId = $contactId;
+        $this->chatType = 'user';
     }
 
-    public function selectChatBot($bot){
-        $this->selectedChatBot = $bot;
+    public function selectChatBot($botChat){
+        $this->chatType = $botChat;
+
+    }
+
+    public function updateContacts(){
+        $this->contacts = Contacts::filterContacts($this->searchContacts, auth()->guard()->user()->id);
     }
 
     public function render()

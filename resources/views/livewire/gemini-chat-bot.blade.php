@@ -1,43 +1,130 @@
-<div class="h-screen">
+<div class="h-screen" x-data="{
+    promptShow: '',
+
+    typeText($el){
+        console.log('entrei')
+        new TypeIt($el, {
+            speed: 50,
+            startDelay: 500,
+            lifeLike: true,
+            cursor: true,
+        }).go();
+        console.log('saii')
+    },
+
+    scrollToBottom() {
+        const el = document.getElementById('element-box');
+        el.style.scrollBehavior = 'smooth';
+        el.scrollTop = el.scrollHeight;
+
+    },
+
+    boxBotton() {
+        const el = document.getElementById('element-box');
+        el.scrollTop = el.scrollHeight;
+    }
+
+
+}">
+
+    <div class="absolute">
+        @if (session()->has('success'))
+            <x-toast-success />
+        @endif
+        @if (session()->has('AlreadyExists'))
+            <x-toast-exists />
+        @endif
+        @if (session()->has('notFound'))
+            <x-toast-not-found />
+        @endif
+    </div>
+
     <div class="h-full grid grid-rows-12">
+
         <section class="row-span-1">
+
             <div class="bg-slate-100 p-2 text-xl font-semibold flex items-center gap-4 h-full">
+
                 <a href="/dashboard" wire:navigate.hover class="flex gap-2 items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                        fill="#000000">
+                        <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z" />
+                    </svg>
                     <p>Back</p>
                 </a>
 
                 <div class="mx-auto my-0">
-                    <img src="{{asset('icons/google-gemini.png')}}" class="h-14">
+                    <img src="{{ asset('icons/google-gemini.png') }}" class="h-14">
                 </div>
+
+                <div class="my-0">
+                    <button wire:click="deleteBotMessages()"
+                        wire:confirm="Deseja deletar todo o histórico de conversas?">
+                        <img src="{{ asset('icons/delete-icon.svg') }}" class="h-8">
+                    </button>
+                </div>
+
             </div>
         </section>
 
-        <section class="row-span-10">
+        <section class="row-span-9 relative">
+
+            <button
+                class="absolute flex justify-center items-center h-10 w-10 rounded-full z-50 right-5 bottom-5 bg-green-400"
+                @click="scrollToBottom()">
+                <img src="{{ asset('icons/keyboard_arrow_down-icon.svg') }}" alt="">
+            </button>
+
             {{-- BOT --}}
-            <div class="h-full p-5 overflow-y-scroll bg-slate-400">
-                <div>
-                    Gemini
-                    <p class="p-4 bg-cyan-600 w-full md:w-2/4">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quae minima illum, iure optio ipsum mollitia doloribus ex. Obcaecati illum quaerat laboriosam ex, ipsam molestias magni consequuntur consequatur, deserunt corporis placeat voluptatem quibusdam saepe ipsa incidunt nihil eos! Repellendus adipisci esse quia veritatis perspiciatis necessitatibus nesciunt fuga exercitationem labore, sequi ea nemo sunt officia modi eligendi vitae ullam odio blanditiis. Exercitationem asperiores ea recusandae cumque veritatis, doloribus dolore deleniti a commodi eveniet reiciendis ullam deserunt iusto explicabo ad nostrum consequatur? Eum, tempora? Distinctio veritatis quo similique placeat saepe fuga dicta, adipisci sint repellendus unde. Omnis, quisquam cupiditate. Id adipisci odit pariatur! lorem1000</p>
-                </div>
+            <div id="element-box" x-init="boxBotton()"
+                class="bg-[#EFEAE2] h-full p-5 overflow-hidden overflow-y-scroll relative">
+                @foreach ($messages as $index => $message)
+                    <div class="flex flex-col items-end ">
+                        You
+                        <p
+                           class="ttt bg-[#EFF6FF] rounded-md p-4 w-full md:w-2/4"
+                        >
+                           {{ $message->prompt }}
+                        </p>
 
-                <div class="flex flex-col items-end">
-                    You
-                    <p class="p-4 bg-cyan-600 w-full md:w-2/4">{{$recentsMessageOnChat}}</p>
-                </div>
+                    </div>
+
+                    <div class="w-full whitespace-normal inline-block">
+                        <span class="text-indigo-600">Gemini</span>
+
+                        <span
+                            id="message-{{$message->id}}"
+                            class="rounded-md m-3 p-3 break-words text-wrap flex flex-col gap-2"
+                            x-on:message-up.window="typeText('message-{{$message->id}}')"
+
+                        >
+
+                            {!! $message->message !!}
+                        </span>
+                        {{-- <hr class="border-t-2 border-gray-400 my-4"> --}}
+                    </div>
+                @endforeach
             </div>
+
+
         </section>
 
-        <section class="row-span-1">
+        <section class="row-span-2 bg-[#F0F2F5] px-2 py-2">
             <form action="" class="flex w-full h-full" wire.prevent wire:submit="formPromptSubmit">
 
-                <input type="text" class="w-full" wire:model="promptInput">
-                <button class="w-28 flex items-center justify-center">
-                    <img src="{{asset('icons/send-icon.svg')}}" class="h-12" >
+                <textarea type="text" class="w-full h-full rounded-md border-none focus:ring-0 resize-none" x-model="promptShow"
+                    wire:model.live="promptInput" name="message"
+                    placeholder="Pergunte algo interessante! Ex: 'Qual é a história por trás do universo?' 😊" required
+                    maxlength="10000">
+                </textarea>
+
+                <button type="submit" class="w-28 flex items-center justify-center border-none">
+                    <img src="{{ asset('icons/send-icon2.svg') }}" class="h-12">
                 </button>
-                
+
             </form>
         </section>
 
     </div>
+
 </div>

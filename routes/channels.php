@@ -19,6 +19,6 @@ Broadcast::channel('chat.channel.{chatRoomId}', function (User $user, $chatRoomI
 });
 
 
-Broadcast::channel('Chat.ia.channel', function () {
-    return true;
+Broadcast::channel('Chat.Bot.{id}', function (User $user, $id) {
+    return (int) $user->id === (int) $id;
 });
