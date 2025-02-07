@@ -37,6 +37,8 @@ class ListUsersChat extends Component
 
         $contactsModel->createContact($getIdUserContactByAdded);
 
+        $this->updateContacts();
+
     }
 
     public function selectContact($contactId){

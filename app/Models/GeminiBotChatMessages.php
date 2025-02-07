@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Support\Facades\DB;
 
 class GeminiBotChatMessages extends Model
 {
@@ -16,32 +16,68 @@ class GeminiBotChatMessages extends Model
 
     public static function saveMessage($userId, $result, $prompt)
     {
-        GeminiBotChatMessages::create([
-            'user_id' => $userId,
-            'prompt' => $prompt,
-            'message' => $result
-        ]);
+        try {
+            GeminiBotChatMessages::create([
+                'user_id' => $userId,
+                'prompt' => $prompt,
+                'message' => $result
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     public static function listAllChatMessage($id){
-        return self::where(function($query) use ($id){
-            $query->where('user_id', $id);
-        })->orderBy('created_at', 'asc')
-        ->get();
+        try {
+            //code...
+            $query = self::where(function($query) use ($id){
+                $query->where('user_id', $id);
+            })->orderBy('created_at', 'asc')
+            ->get();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+        return $query;
     }
 
     public static function listLastChatMessage($id){
-        return self::where(function($query) use ($id){
-            $query->where('user_id', $id);
-        })->orderBy('created_at', 'desc')
-        ->select('prompt', 'message')
-        ->first()
-        ->get();
+        // $query = self::where(function($query) use ($id){
+        //     $query->where('user_id', $id);
+        // })->orderBy('created_at', 'desc')
+        // ->select('prompt', 'message')
+        // ->first()
+        // ->get();
+
+        // return $query;
+
+        // $query = self::where('user_id', $id)
+        //     ->orderBy('created_at', 'desc')
+        //     ->select('prompt', 'message')
+        // ->get();
+
+        // return $query;
+
+        try {
+            //code...
+            $query = DB::select('SELECT prompt, message, id FROM gemini_bot_chat_messages where user_id = ?', [$id]);
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+        return $query;
     }
 
     public static function deleteChatMessage($id){
-        return self::where(function($query) use ($id){
-            $query->where('user_id', $id);
-        })->delete();
+        try {
+            //code...
+            $query = self::where(function($query) use ($id){
+                $query->where('user_id', $id);
+            })->delete();
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
+        return $query;
     }
 }

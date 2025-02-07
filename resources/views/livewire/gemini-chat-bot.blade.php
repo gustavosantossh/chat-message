@@ -1,17 +1,6 @@
 <div class="h-screen" x-data="{
     promptShow: '',
 
-    typeText($el){
-        console.log('entrei')
-        new TypeIt($el, {
-            speed: 50,
-            startDelay: 500,
-            lifeLike: true,
-            cursor: true,
-        }).go();
-        console.log('saii')
-    },
-
     scrollToBottom() {
         const el = document.getElementById('element-box');
         el.style.scrollBehavior = 'smooth';
@@ -22,8 +11,7 @@
     boxBotton() {
         const el = document.getElementById('element-box');
         el.scrollTop = el.scrollHeight;
-    }
-
+    },
 
 }">
 
@@ -81,10 +69,8 @@
                 @foreach ($messages as $index => $message)
                     <div class="flex flex-col items-end ">
                         You
-                        <p
-                           class="ttt bg-[#EFF6FF] rounded-md p-4 w-full md:w-2/4"
-                        >
-                           {{ $message->prompt }}
+                        <p class="ttt bg-[#EFF6FF] rounded-md p-4 w-full md:w-2/4">
+                            {{ $message->prompt }}
                         </p>
 
                     </div>
@@ -92,25 +78,36 @@
                     <div class="w-full whitespace-normal inline-block">
                         <span class="text-indigo-600">Gemini</span>
 
-                        <span
-                            id="message-{{$message->id}}"
+                        <span id="message-{{ $message->id }}"
                             class="rounded-md m-3 p-3 break-words text-wrap flex flex-col gap-2"
-                            x-on:message-up.window="typeText('message-{{$message->id}}')"
-
-                        >
+                            x-on:message-up.window="typeText('message-{{ $message->id }}')">
 
                             {!! $message->message !!}
                         </span>
                         {{-- <hr class="border-t-2 border-gray-400 my-4"> --}}
                     </div>
                 @endforeach
+
+                {{-- <div class="flex flex-col items-end">
+                    You
+                    <p class="ttt bg-[#EFF6FF] rounded-md p-4 w-full md:w-2/4" x-text="promptShow">
+
+                    </p>
+                </div> --}}
+
+                @if ($loading)
+                    <div class="loading ">
+                        <div class="loading border-blue-300 w-7 h-7 border-t-4 rounded-full animate-spin"></div>
+                    </div>
+                @endif
+
             </div>
 
 
         </section>
 
         <section class="row-span-2 bg-[#F0F2F5] px-2 py-2">
-            <form action="" class="flex w-full h-full" wire.prevent wire:submit="formPromptSubmit">
+            <form class="flex w-full h-full" wire.prevent wire:submit="formPromptSubmit">
 
                 <textarea type="text" class="w-full h-full rounded-md border-none focus:ring-0 resize-none" x-model="promptShow"
                     wire:model.live="promptInput" name="message"

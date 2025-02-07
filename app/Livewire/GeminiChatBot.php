@@ -13,6 +13,7 @@ class GeminiChatBot extends Component
 
     public $recentsMessageOnChat;
     public $promptInput;
+    public $loading = false;
     public $messages = [];
 
 
@@ -28,12 +29,14 @@ class GeminiChatBot extends Component
     }
 
     public function loadRecords(){
+        $this->loading = false;
         $this->messages =  GeminiBotChatMessages::listLastChatMessage(auth()->guard()->user()->id);
         $this->dispatch('messageUp');
-        // dd($this->messages);
     }
 
     public function formPromptSubmit(){
+        $this->loading = true;
+
         $userId = auth()->guard()->id();
 
         GenerateTextFromGeminiJob::dispatch($userId, $this->promptInput)->onQueue('TextIa');
