@@ -65,7 +65,7 @@
 
             {{-- BOT --}}
             <div id="element-box" x-init="boxBotton()"
-                class="bg-[#EFEAE2] h-full p-5 overflow-hidden overflow-y-scroll relative">
+                class="bg-[#EFEAE2] h-full p-5 overflow-y-scroll relative">
                 @foreach ($messages as $index => $message)
                     <div class="flex flex-col items-end ">
                         You
@@ -75,25 +75,19 @@
 
                     </div>
 
-                    <div class="w-full whitespace-normal inline-block">
+                    <div>
                         <span class="text-indigo-600">Gemini</span>
 
-                        <span id="message-{{ $message->id }}"
-                            class="rounded-md m-3 p-3 break-words text-wrap flex flex-col gap-2"
+                        <div id="message-{{ $message->id }}"
+                            class="rounded-md m-3 p-3 flex flex-col gap-2 overflow-auto max-w-[800px]"
                             x-on:message-up.window="typeText('message-{{ $message->id }}')">
 
-                            {!! $message->message !!}
-                        </span>
-                        {{-- <hr class="border-t-2 border-gray-400 my-4"> --}}
+                            <div>
+                                {!! $message->message !!}
+                            </div>
+                        </div>
                     </div>
                 @endforeach
-
-                {{-- <div class="flex flex-col items-end">
-                    You
-                    <p class="ttt bg-[#EFF6FF] rounded-md p-4 w-full md:w-2/4" x-text="promptShow">
-
-                    </p>
-                </div> --}}
 
                 @if ($loading)
                     <div class="loading ">
@@ -102,7 +96,6 @@
                 @endif
 
             </div>
-
 
         </section>
 

@@ -10,7 +10,6 @@ use Livewire\Component;
 class GeminiChatBot extends Component
 {
 
-
     public $recentsMessageOnChat;
     public $promptInput;
     public $loading = false;
@@ -20,7 +19,6 @@ class GeminiChatBot extends Component
     public function mount(){
         $this->messages = GeminiBotChatMessages::listAllChatMessage(auth()->guard()->user()->id);
     }
-
 
     public function getListeners() {
         return [

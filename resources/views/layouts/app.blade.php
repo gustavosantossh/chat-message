@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <style>
+
         pre {
             /* Cor de fundo */
             background-color: #181D28;
@@ -25,7 +26,7 @@
             /* Borda */
             border-radius: 5px;
             /* Barra de rolagem horizontal se necessário */
-            overflow-x: auto;
+            overflow: auto;
             /* Fonte monoespaçada */
             font-family: 'Courier New', monospace;
             /* Espaçamento entre linhas */
@@ -39,6 +40,7 @@
             /* Cor do texto do código */
             font-size: 14px;
             /* Tamanho da fonte */
+            overflow: auto;
         }
 
         ::-webkit-scrollbar{

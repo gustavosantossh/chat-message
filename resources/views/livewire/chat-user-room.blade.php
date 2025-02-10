@@ -6,14 +6,12 @@
         el.scrollTop = el.scrollHeight;
     },
 
-    boxBotton(){
+    boxBotton() {
         const el = document.getElementById('element-box');
         el.scrollTop = el.scrollHeight;
     }
 
-}"
-
->
+}">
 
     <div class="absolute">
         @if (session()->has('success'))
@@ -67,16 +65,16 @@
             <div id="element-box" x-init="boxBotton()" class="h-full px-5 overflow-y-scroll bg-[#f1eeea]">
 
                 @if (!empty($listAllMessages))
-                    <div class="overflow-y-auto overflow-x-hidden">
+                    <div class="overflow-auto max-w-[850px]">
                         @foreach ($listAllMessages as $message)
                             @if ($message['sender'] != auth()->guard()->user()->name)
                                 <div>
                                     <div
-                                        class="bg-[#576c99] text-white font-semibold min-w-36 lg:max-w-[60%] sm:max-w-[80%] md:max-w-[70%] p-3 m-3 rounded-md break-words whitespace-normal inline-block">
+                                        class="bg-[#576c99] text-white font-semibold min-w-36  lg:max-w-[512px] sm:max-w-[540px] md:max-w-[5800x] p-3 m-3 rounded-md break-words whitespace-normal inline-block">
                                         <span class="text-amber-400">
                                             {{ $user->name }}:
                                         </span>
-                                        <P>{{ $message['message'] }}</P>
+                                        <div>{{ $message['message'] }}</div>
                                     </div>
                                 </div>
                             @else
@@ -117,7 +115,8 @@
                 <form action="" class="flex items-center w-full h-full" wire.prevent wire:submit="sendMessage">
                     <textarea type="text" class="w-full h-full rounded-md border-none focus:ring-0 resize-none"
                         wire:model="messageInputModel" name="message" placeholder="Digite algo incrível... ou apenas um 'oi' 😊" required
-                        maxlength="10000"></textarea>
+                        maxlength="4000">
+                    </textarea>
 
                     <button type="submit" class="w-28 flex items-center justify-center border-none ">
                         <img src="{{ asset('icons/send-icon2.svg') }}" class="h-12">
