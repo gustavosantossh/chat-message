@@ -20,7 +20,6 @@ class Message extends Model
         return $this->belongsTo(ChatRoom::class);
     }
 
-
     /**
      * @param mixed $sender_id
      * @param mixed $user_id

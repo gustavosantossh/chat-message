@@ -39,7 +39,7 @@ class GenerateTextFromGeminiJob implements ShouldQueue
         try {
 
             // Client Configs
-            $geminiClient = Gemini::client("AIzaSyBPSaycxvVHXvr5s1hBvlCOKAjILpMTnMk");
+            $geminiClient = Gemini::client("YOUR GEMINI CLIENT CODE");
 
             // Generate Content
             $generatedContent  = $geminiClient->geminiPro()->generateContent($this->promptInput);

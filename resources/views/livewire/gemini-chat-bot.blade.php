@@ -64,8 +64,7 @@
             </button>
 
             {{-- BOT --}}
-            <div id="element-box" x-init="boxBotton()"
-                class="bg-[#EFEAE2] h-full p-5 overflow-y-scroll relative">
+            <div id="element-box" x-init="boxBotton()" class="bg-[#EFEAE2] h-full p-5 overflow-y-scroll relative">
                 @foreach ($messages as $index => $message)
                     <div class="flex flex-col items-end ">
                         You

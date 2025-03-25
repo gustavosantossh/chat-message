@@ -109,7 +109,8 @@
             @default
                 <div class="h-screen flex flex-col justify-center items-center bg-[#F0F2F5]">
                     <img src="{{ asset('icons/Chatting-amico.svg') }}" class="h-1/2">
-                    <h1 class="text-xl font-semibold">Selecione um <span class="text-[#407BFF]">chat</span> para iniciar uma conversa.</h1>
+                    <h1 class="text-xl font-semibold">Selecione um <span class="text-[#407BFF]">chat</span> para iniciar uma
+                        conversa.</h1>
                 </div>
         @endswitch
 
